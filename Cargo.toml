@@ -1,0 +1,62 @@
+[package]
+name = "Rust-AC"
+version = "0.1.5"
+edition = "2024"
+authors = ["oldccat66"]
+description = "一个简单好用的连点器"
+license = "MIT"
+
+[[bin]]
+name = "rust-ac"
+path = "src/main.rs"
+
+[dependencies]
+eframe = { version = "0.24", default-features = false, features = ["default_fonts", "glow"] }
+egui = { version = "0.24", default-features = false, features = ["default_fonts"] }
+windows = { version = "0.52", features = [
+    "Win32_Foundation",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_System_Threading",
+    "Win32_UI_WindowsAndMessaging",
+] }
+global-hotkey = "0.4"
+tray-icon = "0.8"
+tokio = { version = "1.0", features = ["rt", "sync", "time"], default-features = false }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dirs = "5.0"
+env_logger = { version = "0.10", default-features = false }
+image = { version = "0.24", default-features = false, features = ["png"] }
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = [
+    "winuser",
+    "processthreadsapi",
+    "synchapi",
+] }
+
+[build-dependencies]
+image = "0.24"
+ico = "0.3"
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
+
+[profile.release]
+opt-level = "z"         # 优化体积而非速度（z 比 s 更激进）
+lto = true              # 链接时优化
+codegen-units = 1       # 单个代码生成单元（更好的优化和更小体积）
+strip = true            # 剥离符号表
+debug = false           # 不生成调试信息
+split-debuginfo = "off" # 不分离调试信息到 PDB
+panic = "abort"         # panic 时直接终止，不展开堆栈（减小体积）
+overflow-checks = false # 关闭溢出检查（release 模式下）
+
+[profile.dev]
+opt-level = 1
+debug = true  # dev 模式保留调试信息
+
+# 优化所有依赖项的体积
+[profile.release.package."*"]
+opt-level = "z"
+strip = true
